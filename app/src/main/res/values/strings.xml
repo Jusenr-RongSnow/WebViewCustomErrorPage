@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">WebViewCustomErrorPage</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_page1_fragment">Hello page1 fragment</string>
+    <string name="hello_page2_fragment">Hello page2 fragment</string>
+</resources>
