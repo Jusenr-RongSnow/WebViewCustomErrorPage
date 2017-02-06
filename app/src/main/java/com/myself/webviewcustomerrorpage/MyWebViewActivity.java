@@ -34,8 +34,8 @@ public class MyWebViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_loading);
         webview = (WebView) findViewById(R.id.webview);
         loading_over = (RelativeLayout) findViewById(R.id.loading_over);
-        setUpView();
 
+        setUpView();
     }
 
     private void setUpView() {
@@ -48,7 +48,7 @@ public class MyWebViewActivity extends AppCompatActivity {
         mWebSettings.setSupportZoom(true);          //允许缩放
         mWebSettings.setBuiltInZoomControls(true);  //原网页基础上缩放
         mWebSettings.setUseWideViewPort(true);      //任意比例缩放
-        webview.setWebViewClient(webClient);  //设置Web视图
+        webview.setWebViewClient(webClient);        //设置Web视图
     }
 
     /***
@@ -58,8 +58,6 @@ public class MyWebViewActivity extends AppCompatActivity {
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             showErrorPage();//显示错误页面
         }
-
-        ;
 
         public void onPageFinished(WebView view, String url) {//处理网页加载成功时
             loading_over.setVisibility(View.GONE);
