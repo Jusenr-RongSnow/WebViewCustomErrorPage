@@ -29,6 +29,7 @@ public class MyWebViewActivity extends AppCompatActivity {
     private String url = "http://blog.csdn.net/github_35033182";
 
     private WebView webview;
+
     private View mErrorView;
     private LinearLayout loading_over;
 
