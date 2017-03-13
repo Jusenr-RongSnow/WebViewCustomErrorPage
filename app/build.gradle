@@ -28,10 +28,10 @@ android {
 //            signingConfig signingConfigs.release
         }
     }
-    compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
-    }
+//    compileOptions {
+//        targetCompatibility 1.8
+//        sourceCompatibility 1.8
+//    }
     //源码集
     sourceSets {
         main {

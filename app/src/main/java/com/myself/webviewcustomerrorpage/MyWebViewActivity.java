@@ -1,22 +1,27 @@
 package com.myself.webviewcustomerrorpage;
 /***
- * 时间:2015年 6月21日
+ * 时间:2017年 3月13日
  * 功能:主要处理 webview在加载网页和加载网页失败时的过程
  * 当 webview在请求网页的这段时间:让它显示一个自定义的页面
- * 当 webview请求失败时:让它显示自定义的网页(本人觉得系统自带的太丑了)
- * 看了如果还是不懂就加我QQ:1064541462
+ * 当 webview请求失败时:让它显示自定义的网页
+ * 看了如果还是不懂就加我QQ:917641472
  */
 
+import android.content.res.ColorStateList;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager.LayoutParams;
 import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 
@@ -25,15 +30,17 @@ public class MyWebViewActivity extends AppCompatActivity {
 
     private WebView webview;
     private View mErrorView;
+    private LinearLayout loading_over;
+
     private WebSettings mWebSettings;
-    private RelativeLayout loading_over;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
+
         webview = (WebView) findViewById(R.id.webview);
-        loading_over = (RelativeLayout) findViewById(R.id.loading_over);
+        loading_over = (LinearLayout) findViewById(R.id.loading_over);
 
         setUpView();
     }
@@ -48,13 +55,48 @@ public class MyWebViewActivity extends AppCompatActivity {
         mWebSettings.setSupportZoom(true);          //允许缩放
         mWebSettings.setBuiltInZoomControls(true);  //原网页基础上缩放
         mWebSettings.setUseWideViewPort(true);      //任意比例缩放
-        webview.setWebViewClient(webClient);        //设置Web视图
+        webview.setWebViewClient(mWebViewClient);   //设置Web视图
+        webview.setWebChromeClient(mWebChromeClient);
     }
+
+    WebChromeClient mWebChromeClient = new WebChromeClient() {
+        private ProgressBar mBar;
+
+        @Override
+        public void onProgressChanged(WebView view, int newProgress) {
+            super.onProgressChanged(view, newProgress);
+            Log.e("####", "onProgressChanged: --" + newProgress);
+
+            ViewGroup mParent = (ViewGroup) view.getParent();
+            if (mBar == null) {
+                mBar = new ProgressBar(getApplicationContext(), null, android.R.attr.progressBarStyleHorizontal);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    mBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.bg_B57DE4)));
+                }
+                ViewGroup.LayoutParams lp0 = new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        5);
+                ViewGroup.LayoutParams lp1 = new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT);
+                mParent.removeView(view);
+                mParent.addView(mBar, 0, lp0);
+                mParent.addView(view, 1, lp1);
+            }
+
+            if (newProgress == 100) {
+                mBar.setVisibility(View.GONE);
+            } else {
+                mBar.setProgress(newProgress);
+            }
+        }
+    };
 
     /***
      * 设置Web视图的方法
      */
-    WebViewClient webClient = new WebViewClient() {//处理网页加载失败时
+    WebViewClient mWebViewClient = new WebViewClient() {
+        //处理网页加载失败时
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             showErrorPage();//显示错误页面
         }
@@ -70,6 +112,8 @@ public class MyWebViewActivity extends AppCompatActivity {
 
     protected void showErrorPage() {
         LinearLayout webParentView = (LinearLayout) webview.getParent();
+
+
         initErrorPage();//初始化自定义页面
         while (webParentView.getChildCount() > 1) {
             webParentView.removeViewAt(0);
@@ -78,18 +122,6 @@ public class MyWebViewActivity extends AppCompatActivity {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         webParentView.addView(mErrorView, 0, lp);
         mIsErrorPage = true;
-    }
-
-    /****
-     * 把系统自身请求失败时的网页隐藏
-     */
-    protected void hideErrorPage() {
-        LinearLayout webParentView = (LinearLayout) webview.getParent();
-
-        mIsErrorPage = false;
-        while (webParentView.getChildCount() > 1) {
-            webParentView.removeViewAt(0);
-        }
     }
 
     /***
@@ -106,17 +138,5 @@ public class MyWebViewActivity extends AppCompatActivity {
             });
             mErrorView.setOnClickListener(null);
         }
-    }
-
-
-    //设置回退
-    //覆盖Activity类的onKeyDown(int keyCoder,KeyEvent event)方法
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && webview.canGoBack()) {
-            webview.goBack(); //goBack()表示返回WebView的上一页面
-            return true;
-        }
-        return false;
     }
 }
